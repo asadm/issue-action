@@ -26,11 +26,13 @@ runs:
       run: |
         BRANCH_NAME="issue-${{ github.event.issue.number }}"
         git switch -c $BRANCH_NAME
+      shell: bash
 
     - name: Push branch
       run: |
         BRANCH_NAME="issue-${{ github.event.issue.number }}"
         git push origin $BRANCH_NAME
+      shell: bash
 
     - name: Update comment to Running
       id: update_comment
@@ -89,6 +91,7 @@ runs:
         node-version: '16'
 
     - run: echo "todo node work" && sleep 10
+      shell: bash
 
     - name: Update comment to Completed
       uses: actions/github-script@v5
