@@ -27,7 +27,7 @@ runs:
       uses: octokit/request-action@v2.x
       with:
         route: GET /repos/:owner/:repo/git/ref/:ref
-        owner: ${{ github.repository_owner }}
+        # owner: ${{ github.repository_owner }}
         repo: ${{ github.repository }}
         ref: heads/issue-${{ github.event.issue.number }}
       env:
