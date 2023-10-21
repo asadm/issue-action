@@ -49,6 +49,7 @@ runs:
             owner,
             repo,
             issue_number,
+            per_page: 100
           });
           const latestUserComment = comments.reverse().find(comment => comment.user.login !== 'github-actions[bot]');
           const userCommentLink = latestUserComment ? `#issuecomment-${latestUserComment.id}` : 'N/A';
@@ -107,6 +108,7 @@ runs:
             owner,
             repo,
             issue_number,
+            per_page: 100
           });
     
           // Find the bot's comment that has the current workflow link
