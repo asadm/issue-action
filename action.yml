@@ -31,7 +31,8 @@ runs:
     - name: Push branch
       run: |
         BRANCH_NAME="issue-${{ github.event.issue.number }}"
-        git reset --hard origin $BRANCH_NAME; git push origin $BRANCH_NAME
+        REMOTE_REPO="https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+        git reset --hard "$remote_repo" $BRANCH_NAME; git push origin $BRANCH_NAME
       shell: bash
 
     - name: Update comment to Running
