@@ -31,7 +31,7 @@ runs:
     - name: Push branch
       run: |
         BRANCH_NAME="issue-${{ github.event.issue.number }}"
-        git pull; git push origin $BRANCH_NAME
+        git pull origin $BRANCH_NAME; git push origin $BRANCH_NAME
       shell: bash
 
     - name: Update comment to Running
