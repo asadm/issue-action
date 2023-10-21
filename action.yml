@@ -26,9 +26,9 @@ runs:
       id: check-branch
       uses: octokit/request-action@v2.x
       with:
-        route: GET /repos/:owner/:repo/git/ref/:ref
+        route: GET /repos/${{ github.repository }}/git/ref/:ref
         # owner: ${{ github.repository_owner }}
-        repo: ${{ github.repository }}
+        # repo: ${{ github.repository }}
         ref: heads/issue-${{ github.event.issue.number }}
       env:
         GITHUB_TOKEN: ${{ inputs.GITHUB_TOKEN }}
