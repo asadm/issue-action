@@ -7,32 +7,49 @@ inputs:
   GITHUB_TOKEN:
     description: 'Derivative token for using the GitHub REST API'
     required: true
-  # OPENAI_API_KEY:
-  #   description: 'OpenAI API Key'
-  #   required: true
-  # OPENAI_ORG_KEY:
-  #   description: 'OpenAI Organization ID'
-  #   required: true
+  # Other inputs omitted for brevity
 
-runs:
-  using: "composite"
-  steps:
+on: [push]
+jobs:
+  handle-branch:
+    runs-on: ubuntu-latest
+    steps:
     - name: Checkout code
       uses: actions/checkout@v2
       with:
         fetch-depth: 0
 
+    - name: Check if branch exists
+      id: check-branch
+      uses: octokit/request-action@v2.x
+      with:
+        route: GET /repos/:owner/:repo/git/ref/:ref
+        owner: ${{ github.repository_owner }}
+        repo: ${{ github.repository }}
+        ref: heads/issue-${{ github.event.issue.number }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      continue-on-error: true
+
     - name: Creating or switching branch
+      if: steps.check-branch.outputs.status != 200
       run: |
         BRANCH_NAME="issue-${{ github.event.issue.number }}"
         git switch -c $BRANCH_NAME
       shell: bash
 
-    - name: Push branch
+    - name: Switching to existing branch
+      if: steps.check-branch.outputs.status == 200
       run: |
         BRANCH_NAME="issue-${{ github.event.issue.number }}"
-        REMOTE_REPO="https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
-        git reset --hard "$REMOTE_REPO" $BRANCH_NAME; git push origin $BRANCH_NAME
+        git switch $BRANCH_NAME
+      shell: bash
+
+    - name: Push branch
+      if: steps.check-branch.outputs.status != 200
+      run: |
+        BRANCH_NAME="issue-${{ github.event.issue.number }}"
+        git push origin $BRANCH_NAME
       shell: bash
 
     - name: Update comment to Running
