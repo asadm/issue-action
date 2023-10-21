@@ -1,0 +1,135 @@
+name: 'issue-responding'
+description: 'Temp'
+branding:
+  icon: 'git-pull-request'
+  color: 'green'
+inputs:
+  GITHUB_TOKEN:
+    description: 'Derivative token for using the GitHub REST API'
+    required: true
+  # OPENAI_API_KEY:
+  #   description: 'OpenAI API Key'
+  #   required: true
+  # OPENAI_ORG_KEY:
+  #   description: 'OpenAI Organization ID'
+  #   required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+
+    - name: Creating or switching branch
+      run: |
+        BRANCH_NAME="issue-${{ github.event.issue.number }}"
+        git switch -c $BRANCH_NAME
+
+    - name: Push branch
+      run: |
+        BRANCH_NAME="issue-${{ github.event.issue.number }}"
+        git push origin $BRANCH_NAME
+
+    - name: Update comment to Running
+      id: update_comment
+      uses: actions/github-script@v5
+      with:
+        script: |
+          const issue_number = ${{ github.event.issue.number }};
+          const owner = `${{ github.repository_owner }}`;
+          const repo = `${{ github.event.repository.name }}`;
+          const now = new Date();
+          const formattedTime = now.toISOString().substr(11, 8); 
+          const workflowLink = `${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}`;
+          const { data: comments } = await github.rest.issues.listComments({
+            owner,
+            repo,
+            issue_number,
+          });
+          const latestUserComment = comments.reverse().find(comment => comment.user.login !== 'github-actions[bot]');
+          const userCommentLink = latestUserComment ? `#issuecomment-${latestUserComment.id}` : 'N/A';
+          const botComment = comments.find(comment => comment.user.login === 'github-actions[bot]' && comment.body.includes("Branch:"));
+
+          let comment_id;
+          if (botComment) {
+            const updated_body = botComment.body + `\n| ${formattedTime} | [Workflow](${workflowLink}) | [Comment](${userCommentLink}) | Running |`;
+            await github.rest.issues.updateComment({
+              owner,
+              repo,
+              comment_id: botComment.id,
+              body: updated_body
+            });
+            comment_id = botComment.id;
+          } else {
+            const initialComment = `Branch: [issue-${{ github.event.issue.number }}](https://github.com/${{ github.repository }}/tree/issue-${{ github.event.issue.number }})
+            
+            | Timestamp | Workflow | For Comment | Status
+            | --- | --- | --- | --- |
+            | ${formattedTime} | [Workflow](${workflowLink}) | [Comment](${userCommentLink}) | Running |`;
+            
+            const { data: newComment } = await github.rest.issues.createComment({
+              owner,
+              repo,
+              issue_number,
+              body: initialComment
+            });
+            comment_id = newComment.id;
+          }
+          console.log("comment", comment_id);
+          return {
+            comment_id: comment_id
+          };
+        github-token: ${{secrets.GITHUB_TOKEN}}
+
+    - name: Install Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '16'
+
+    - run: echo "todo node work" && sleep 10
+
+    - name: Update comment to Completed
+      uses: actions/github-script@v5
+      with:
+        script: |
+          const issue_number = ${{ github.event.issue.number }};
+          const owner = `${{ github.repository_owner }}`;
+          const repo = `${{ github.event.repository.name }}`;
+          const workflowLink = `${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}`;
+    
+          // Fetch comments for the issue
+          const { data: comments } = await github.rest.issues.listComments({
+            owner,
+            repo,
+            issue_number,
+          });
+    
+          // Find the bot's comment that has the current workflow link
+          const botComment = comments.find(comment => comment.user.login === 'github-actions[bot]' && comment.body.includes(workflowLink));
+    
+          if (botComment) {
+            // Split the comment's body by line breaks
+            let lines = botComment.body.split('\n');
+            
+            // Find the line containing the current workflow's link and update its status
+            for (let i = 0; i < lines.length; i++) {
+              if (lines[i].includes(workflowLink)) {
+                lines[i] = lines[i].replace("| Running |", "| Completed |");
+                break;
+              }
+            }
+    
+            // Reconstruct the comment's body
+            const updated_body = lines.join('\n');
+    
+            // Update the comment
+            await github.rest.issues.updateComment({
+              owner,
+              repo,
+              comment_id: botComment.id,
+              body: updated_body
+            });
+          }
+        github-token: ${{secrets.GITHUB_TOKEN}}
