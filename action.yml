@@ -31,7 +31,7 @@ runs:
         repo: ${{ github.repository }}
         ref: heads/issue-${{ github.event.issue.number }}
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ inputs.GITHUB_TOKEN }}
       continue-on-error: true
 
     - name: Creating or switching branch
