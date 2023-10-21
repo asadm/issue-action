@@ -83,7 +83,7 @@ runs:
           return {
             comment_id: comment_id
           };
-        github-token: ${{secrets.GITHUB_TOKEN}}
+        github-token: ${{inputs.GITHUB_TOKEN}}
 
     - name: Install Node.js
       uses: actions/setup-node@v3
@@ -135,4 +135,4 @@ runs:
               body: updated_body
             });
           }
-        github-token: ${{secrets.GITHUB_TOKEN}}
+        github-token: ${{inputs.GITHUB_TOKEN}}
