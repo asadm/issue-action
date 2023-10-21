@@ -99,6 +99,7 @@ runs:
         git config --global user.email "bot@domain.com"
         git config --global user.name "Action Bot"
         BRANCH_NAME="issue-${{ github.event.issue.number }}"
+        git add .
         git commit -m "work"
         git push origin $BRANCH_NAME
       shell: bash
