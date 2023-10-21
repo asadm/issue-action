@@ -96,6 +96,8 @@ runs:
 
     - name: Commit and push branch
       run: |
+        git config --global user.email "bot@domain.com"
+        git config --global user.name "Action Bot"
         BRANCH_NAME="issue-${{ github.event.issue.number }}"
         git commit -m "work"
         git push origin $BRANCH_NAME
