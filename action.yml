@@ -7,13 +7,16 @@ inputs:
   GITHUB_TOKEN:
     description: 'Derivative token for using the GitHub REST API'
     required: true
-  # Other inputs omitted for brevity
+  # OPENAI_API_KEY:
+  #   description: 'OpenAI API Key'
+  #   required: true
+  # OPENAI_ORG_KEY:
+  #   description: 'OpenAI Organization ID'
+  #   required: true
 
-on: [push]
-jobs:
-  handle-branch:
-    runs-on: ubuntu-latest
-    steps:
+runs:
+  using: "composite"
+  steps:
     - name: Checkout code
       uses: actions/checkout@v2
       with:
