@@ -91,7 +91,14 @@ runs:
       with:
         node-version: '16'
 
-    - run: echo "todo node work" && sleep 10
+    - run: echo "todo node work." >> temp.txt && sleep 10
+      shell: bash
+
+    - name: Commit and push branch
+      run: |
+        BRANCH_NAME="issue-${{ github.event.issue.number }}"
+        git commit -m "work"
+        git push origin $BRANCH_NAME
       shell: bash
 
     - name: Update comment to Completed
