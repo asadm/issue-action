@@ -112,8 +112,10 @@ runs:
       with:
         node-version: '16'
 
-    - run: echo "todo node work." >> temp.txt && sleep 10
+    - run: node index.js && sleep 10
       shell: bash
+      env:
+          GITHUB_TOKEN: ${{ inputs.GITHUB_TOKEN }}
 
     - name: Commit and push branch
       run: |
