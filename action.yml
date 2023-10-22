@@ -113,6 +113,7 @@ runs:
         cache: 'npm'
         node-version: '16'
     - run: current_dir=$(pwd) && cd ${{ github.action_path }} && npm install && cd "$current_dir"
+      shell: bash
     - run: node ${{ github.action_path }}/index.js && sleep 10
       shell: bash
       env:
