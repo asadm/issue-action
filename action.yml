@@ -110,7 +110,7 @@ runs:
     - name: Install Node.js
       uses: actions/setup-node@v3
       with:
-        node-version: '16'
+        node-version: '18'
     - run: current_dir=$(pwd) && cd ${{ github.action_path }} && npm install && cd "$current_dir"
       shell: bash
     - run: node ${{ github.action_path }}/index.js && sleep 10
