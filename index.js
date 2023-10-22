@@ -9,6 +9,7 @@ async function getIssueAndComments() {
         owner: process.env.GITHUB_REPOSITORY.split('/')[0],
         repo: process.env.GITHUB_REPOSITORY.split('/')[1],
         issue_number: process.env.GITHUB_EVENT_PATH ? require(process.env.GITHUB_EVENT_PATH).issue.number : undefined,
+        per_page: 100
     };
 
     if (!context.issue_number) {

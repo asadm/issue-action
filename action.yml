@@ -124,8 +124,13 @@ runs:
         git config --global user.name "Action Bot"
         BRANCH_NAME="issue-${{ github.event.issue.number }}"
         git add .
-        git commit -m "work"
-        git push origin $BRANCH_NAME
+        # Check if there are any changes to commit
+        if [[ -n $(git diff --cached) ]]; then
+          git commit -m "work"
+          git push origin $BRANCH_NAME
+        else
+          echo "No changes to commit"
+        fi
       shell: bash
 
     - name: Update comment to Completed
